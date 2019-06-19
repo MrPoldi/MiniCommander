@@ -47,10 +47,32 @@ namespace MiniCommander
             catch (Exception)
             {
                 
-            }
-            
+            }            
 
             return files;
+        }
+
+        public UpperDirectory GetUpperDirectory()
+        {
+            string path = this.Path;
+            int count = 0;
+            foreach (char c in path)
+                if (c == '\\') count++;
+
+            if (count == 1)
+            {
+
+                path = path.Substring(0, path.LastIndexOf(@"\") + 1);
+
+            }
+            else if (count > 1)
+            {
+                path = path.Substring(0, path.LastIndexOf(@"\"));
+            }
+
+            UpperDirectory upDir = new UpperDirectory(path);
+
+            return upDir;
         }
     }
 }

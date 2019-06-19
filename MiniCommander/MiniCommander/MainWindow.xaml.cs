@@ -22,9 +22,9 @@ namespace MiniCommander
     /// Logika interakcji dla klasy MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window    {
-
+        #region Fields
+        
         ListView currFilesView;
-
         DriveInfo[] drives;
         List<DiscItem> filesToCopy;
 
@@ -40,16 +40,43 @@ namespace MiniCommander
         UpperDirectory upDirR;
         DirectoryItem dirR;
         bool ascendingSortNameR = true;
-        bool ascendingSortDateR = false;        
-        
+        bool ascendingSortDateR = false;
 
+        #endregion
+
+        #region Constructors
         public MainWindow()
         {
             InitializeComponent();
             this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);                
             currFilesView = FilesViewL;
+        }
+        #endregion
+
+        #region Operations on Files and Directories
+        /// <summary>
+        /// Get items in directory and it's upper directory
+        /// </summary>
+        private void GetItems()
+        {
+            if (currFilesView == FilesViewL)
+            {
+                directoriesL = dirL.GetDirectories();
+                filesL = dirL.GetFiles();
+                upDirL = dirL.GetUpperDirectory();
+            }
+            else
+            {
+                directoriesR = dirR.GetDirectories();
+                filesR = dirR.GetFiles();
+                upDirR = dirR.GetUpperDirectory();
+            }
         }        
 
+        /// <summary>
+        /// Change directory in current FilesView and adequate field
+        /// </summary>
+        /// <param name="sender"></param>
         private void ChangeDirectory(object sender)
         {
             if (currFilesView == FilesViewL)
@@ -60,30 +87,151 @@ namespace MiniCommander
             {
                 dirR = new DirectoryItem((sender as DirectoryItem).Path);
             }
-            
+
             GetItems();
             RefreshFilesView();
         }
 
-        private void GetItems()
+        /// <summary>
+        /// Delete selected files and directories recursively
+        /// </summary>
+        private void DeleteDiscItem()
         {
-            if(currFilesView == FilesViewL)
+            List<DiscItem> deletePaths = new List<DiscItem>();
+            foreach (DiscItem item in currFilesView.SelectedItems)
             {
-                directoriesL = dirL.GetDirectories();
-                filesL = dirL.GetFiles();
-                upDirL = GetUpperDirectory(dirL);
+                deletePaths.Add(item);
+            }
+
+            foreach (DiscItem item in deletePaths)
+            {
+                if (item is DirectoryItem) Directory.Delete(item.Path, true);
+                if (item is FileItem) File.Delete(item.Path);
+            }
+
+            GetItems();
+            RefreshFilesView();
+        }
+
+        /// <summary>
+        /// Open a dialog to create a new dir and create a new directory
+        /// </summary>
+        private void CreateDirectory()
+        {
+            CreateDirectoryDialog dialog = new CreateDirectoryDialog();
+            dialog.ShowDialog();
+            string result = dialog.newDir;
+            string newDirPath;
+            if (currFilesView == FilesViewL)
+            {
+                newDirPath = dirL.Path + @"\" + result;
             }
             else
             {
-                directoriesR = dirR.GetDirectories();
-                filesR = dirR.GetFiles();
-                upDirR = GetUpperDirectory(dirR);
+                newDirPath = dirR.Path + @"\" + result;
+            }
+
+
+            Directory.CreateDirectory(newDirPath);
+            GetItems();
+            RefreshFilesView();
+        }
+
+        #region Copy and 
+
+        /// <summary>
+        /// Add selected files to a list and enable paste buttons
+        /// </summary> 
+        private void CopyDiscItem()
+        {
+            // TODO: Enable ContextMenu buttons
+            filesToCopy = new List<DiscItem>();
+            foreach (DiscItem item in currFilesView.SelectedItems)
+            {
+                filesToCopy.Add(item);
+            }
+            if (FilesViewR.IsEnabled)
+            {
+                PasteR_Button.IsEnabled = true;
+            }
+            if (FilesViewL.IsEnabled)
+            {
+                PasteR_Button_Copy.IsEnabled = true;
             }
         }
 
+        /// <summary>
+        /// Paste files from filesToCopy list to a destination directory
+        /// <para>It uses an overloaded method for recursive copying of directories</para>
+        /// </summary>
+        private void PasteDiscItem()
+        {
+            string destDirPath;
+            if (currFilesView == FilesViewL)
+            {
+                destDirPath = dirL.Path;
+            }
+            else
+            {
+                destDirPath = dirR.Path;
+            }
+            foreach (DiscItem item in filesToCopy)
+            {
+                if (item is FileItem)
+                {
+                    if (!File.Exists(Path.Combine(destDirPath, item.Name)))
+                    {
+                        File.Copy(item.Path, Path.Combine(destDirPath, item.Name));
+                    }
+                }
+                else if (item is DirectoryItem)
+                {
+                    if (!Directory.Exists(Path.Combine(destDirPath, item.Name)))
+                    {
+                        Directory.CreateDirectory(Path.Combine(destDirPath, item.Name));
+                    }
+                    PasteDiscItem(Path.Combine(destDirPath, item.Name), item as DirectoryItem);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Copies directories recursively with their files
+        /// </summary>
+        /// <param name="destDirPath">Destination path</param>
+        /// <param name="dir">Currently copied directory</param>
+        private void PasteDiscItem(string destDirPath, DirectoryItem dir)
+        {
+            List<DirectoryItem> dirs = dir.GetDirectories();
+            List<FileItem> files = dir.GetFiles();
+            foreach (FileItem file in files)
+            {
+                if (!File.Exists(Path.Combine(destDirPath, file.Name)))
+                {
+                    File.Copy(file.Path, Path.Combine(destDirPath, file.Name));
+                }
+            }
+            foreach (DirectoryItem directory in dirs)
+            {
+                if (!Directory.Exists(Path.Combine(destDirPath, directory.Name)))
+                {
+                    Directory.CreateDirectory(Path.Combine(destDirPath, directory.Name));
+                }
+                PasteDiscItem(Path.Combine(destDirPath, directory.Name), directory as DirectoryItem);
+            }
+        }
+        #endregion
+
+        #endregion
+
+        #region FilesView Methods
+
+        /// <summary>
+        /// Refresh the contents of FilesViews
+        /// </summary>
         private void RefreshFilesView()
-        {            
-            if((dirL != null && dirR != null) && dirL.Path == dirR.Path)
+        {
+            if ((dirL != null && dirR != null) && dirL.Path == dirR.Path)
             {
                 ListView tempFV = currFilesView;
 
@@ -96,21 +244,21 @@ namespace MiniCommander
                 GetItems();
                 foreach (DirectoryItem directory in directoriesL)
                 {
-                    FilesViewL.Items.Add(directory);                    
+                    FilesViewL.Items.Add(directory);
                 }
                 foreach (FileItem file in filesL)
                 {
-                    FilesViewL.Items.Add(file);                    
+                    FilesViewL.Items.Add(file);
                 }
 
                 currFilesView = FilesViewR;
                 GetItems();
                 foreach (DirectoryItem directory in directoriesR)
-                {                    
+                {
                     FilesViewR.Items.Add(directory);
                 }
                 foreach (FileItem file in filesR)
-                {                   
+                {
                     FilesViewR.Items.Add(file);
                 }
 
@@ -146,62 +294,13 @@ namespace MiniCommander
             }
         }
 
-        private UpperDirectory GetUpperDirectory(DirectoryItem dir)
-        {
-            string path = dir.Path;            
-            int count = 0;
-            foreach (char c in path)
-                if (c == '\\') count++;
-
-            if(count == 1)
-            {
-                
-                path = path.Substring(0, path.LastIndexOf(@"\") + 1);
-
-            }
-            else if(count > 1)
-            {
-                path = path.Substring(0, path.LastIndexOf(@"\"));                
-            }
-            UpperDirectory upDir = new UpperDirectory(path);
-
-            return upDir;
-        }
-
-        private void FilesView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            DiscItem item = currFilesView.SelectedItem as DiscItem;
-            if (item is FileItem)
-            {
-                System.Diagnostics.Process.Start(item.Path);
-            }
-            else if (item == null)
-            {
-                
-            }
-            else if(item is DirectoryItem)
-            {
-                ChangeDirectory(item);
-            }
-            
-            
-        }
-
-        private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
-        {
-            var headerClicked = e.OriginalSource as GridViewColumnHeader;
-            string header = headerClicked.Content as string;
-            if (dirL != null && currFilesView == FilesViewL)
-            {
-                Sort(header, directoriesL, filesL);
-            }
-            else if (dirR != null && currFilesView == FilesViewR)
-            {
-                Sort(header, directoriesR, filesR);
-            }
-        }
-
-        
+        /// <summary>
+        /// Sort file and directory lists
+        /// </summary>
+        /// <param name="sortBy">Name or Date</param>
+        /// <param name="directories">List of directories to sort</param>
+        /// <param name="files">List of files to sort</param>
+        // TODO: Implement IComparable/IComparer rather than use this method to sort DiscItems
         private void Sort(string sortBy, List<DirectoryItem> directories, List<FileItem> files)
         {
             bool ascendingSortName = true;
@@ -213,18 +312,18 @@ namespace MiniCommander
                 ascendingSortDate = ascendingSortDateL;
                 ascendingSortName = ascendingSortNameL;
             }
-            else if(currFilesView == FilesViewR)
+            else if (currFilesView == FilesViewR)
             {
                 ascendingSortDate = ascendingSortDateR;
                 ascendingSortName = ascendingSortNameR;
-            }            
-            
-            
-            if(sortBy == "Name")
+            }
+
+
+            if (sortBy == "Name")
             {
                 if (ascendingSortName)
                 {
-                    
+
                     directories.Sort(delegate (DirectoryItem x, DirectoryItem y)
                     {
                         return y.Name.CompareTo(x.Name);
@@ -234,7 +333,7 @@ namespace MiniCommander
                     {
                         return y.Name.CompareTo(x.Name);
                     });
-                    
+
                     ascendingSortName = false;
                 }
                 else
@@ -248,8 +347,8 @@ namespace MiniCommander
                     {
                         return x.Name.CompareTo(y.Name);
                     });
-                    
-                    ascendingSortName = true;                    
+
+                    ascendingSortName = true;
                 }
             }
 
@@ -299,6 +398,117 @@ namespace MiniCommander
             RefreshFilesView();
         }
 
+        #endregion
+
+        #region Events
+
+        #region FilesView
+
+        /// <summary>
+        /// Change directory or open a file in default app
+        /// </summary>        
+        private void FilesView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DiscItem item = currFilesView.SelectedItem as DiscItem;
+            if (item is FileItem)
+            {
+                System.Diagnostics.Process.Start(item.Path);
+            }
+            else if (item == null)
+            {
+
+            }
+            else if (item is DirectoryItem)
+            {
+                ChangeDirectory(item);
+            }
+        }
+
+        /// <summary>
+        /// Sort FilesView by clicked column
+        /// </summary>        
+        private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
+        {
+            var headerClicked = e.OriginalSource as GridViewColumnHeader;
+            string header = headerClicked.Content as string;
+            if (dirL != null && currFilesView == FilesViewL)
+            {
+                Sort(header, directoriesL, filesL);
+            }
+            else if (dirR != null && currFilesView == FilesViewR)
+            {
+                Sort(header, directoriesR, filesR);
+            }
+        }
+
+        /// <summary>
+        /// Set current FilesView as left
+        /// </summary>        
+        private void FilesViewL_GotFocus(object sender, RoutedEventArgs e)
+        {
+            currFilesView = FilesViewL;
+        }
+
+        /// <summary>
+        /// Set current FilesView as right
+        /// </summary> 
+        private void FilesViewR_GotFocus(object sender, RoutedEventArgs e)
+        {
+            currFilesView = FilesViewR;
+        }
+
+        /// <summary>
+        /// Eneble drag and drop copy of selected items
+        /// </summary>        
+        private void FilesView_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (Mouse.LeftButton == MouseButtonState.Pressed)
+            {
+                CopyDiscItem();
+                DragDrop.DoDragDrop(currFilesView,
+                             currFilesView.SelectedItems,
+                             DragDropEffects.Copy);
+            }
+        }
+
+        /// <summary>
+        /// Paste files on drop
+        /// </summary>        
+        private void FilesView_Drop(object sender, DragEventArgs e)
+        {
+            if (currFilesView != sender as ListView)
+            {
+                currFilesView = sender as ListView;
+                PasteDiscItem();
+                GetItems();
+                RefreshFilesView();
+            }
+        }
+        #endregion
+
+        #region Context Menu
+        
+        private void ContextMenuDelete_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteDiscItem();
+        }
+
+        private void ContextMenuNewDir_Click(object sender, RoutedEventArgs e)
+        {
+            CreateDirectory();
+        }
+
+        private void ContextMenuCopy_Click(object sender, RoutedEventArgs e)
+        {
+            CopyDiscItem();
+        }
+        #endregion
+
+        #region ComboBox
+
+        /// <summary>
+        /// Add available drives to ComboBox
+        /// </summary>        
         private void ComboBox_Loaded(object sender, RoutedEventArgs e)
         {
             drives = DriveInfo.GetDrives();
@@ -311,18 +521,23 @@ namespace MiniCommander
             }
         }
 
+        /// <summary>
+        /// Change drive in adequate FilesView
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DrivesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //change current files view
-            if((sender as ComboBox).Name == "drivesComboBoxL")
+            if ((sender as ComboBox).Name == "drivesComboBoxL")
             {
                 currFilesView = FilesViewL;
-                CopyL_Button.IsEnabled = true;                
+                CopyL_Button.IsEnabled = true;
             }
             else
             {
                 currFilesView = FilesViewR;
-                CopyR_Button.IsEnabled = true;                
+                CopyR_Button.IsEnabled = true;
             }
 
             CreateDirectoryButton.IsEnabled = true;
@@ -332,168 +547,23 @@ namespace MiniCommander
             DirectoryItem dir = new DirectoryItem(path);
             ChangeDirectory(dir);
         }
-        
+        #endregion
 
-        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.F7)
-            {
-                CreateDirectory();
-            }
-            else if (e.Key == Key.F8 || e.Key == Key.Delete)
-            {
-                DeleteDiscItem();                
-            }
-            //else if(e.Key == Key.LeftCtrl && e.IsDown)
-            //{
-                                              
-            //}
-        }
-
-        private void DeleteDiscItem()
-        {
-            List<DiscItem> deletePaths = new List<DiscItem>();
-            foreach (DiscItem item in currFilesView.SelectedItems)
-            {
-                deletePaths.Add(item);
-            }            
-
-            foreach (DiscItem item in deletePaths)
-            {
-                if (item is DirectoryItem) Directory.Delete(item.Path, true);
-                if (item is FileItem) File.Delete(item.Path);
-            }
-            
-            GetItems();            
-            RefreshFilesView();
-        }
-
-        private void CreateDirectory()
-        {
-            CreateDirectoryDialog dialog = new CreateDirectoryDialog();
-            dialog.ShowDialog();
-            string result = dialog.newDir;
-            string newDirPath;
-            if(currFilesView == FilesViewL)
-            {
-                newDirPath = dirL.Path + @"\" + result;
-            }
-            else
-            {
-                newDirPath = dirR.Path + @"\" + result;
-            }
-            
-
-            Directory.CreateDirectory(newDirPath);
-            //ListView tempFV = currFilesView;
-            //currFilesView = FilesViewL;
-            GetItems();
-            //currFilesView = tempFV;
-            RefreshFilesView();
-        }        
+        #region Buttons
 
         private void CreateDirectoryButton_Click(object sender, RoutedEventArgs e)
         {
             CreateDirectory();
         }
 
-        private void ContextMenuDelete_Click(object sender, RoutedEventArgs e)
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             DeleteDiscItem();
         }
 
-        private void ContextMenuNewDir_Click(object sender, RoutedEventArgs e)
-        {
-            CreateDirectory();
-        }
-
-        private void FilesViewL_GotFocus(object sender, RoutedEventArgs e)
-        {
-            currFilesView = FilesViewL;
-        }
-
-        private void FilesViewR_GotFocus(object sender, RoutedEventArgs e)
-        {
-            currFilesView = FilesViewR;
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            DeleteDiscItem();
-        }
-
-        private void Copy_Button_Click(object sender, RoutedEventArgs e)
+        private void CopyButton_Click(object sender, RoutedEventArgs e)
         {
             CopyDiscItem();
-        }
-
-        private void CopyDiscItem()
-        {
-            filesToCopy = new List<DiscItem>();
-            foreach(DiscItem item in currFilesView.SelectedItems)
-            {
-                filesToCopy.Add(item);
-            }
-            if (FilesViewR.IsEnabled)
-            {
-                PasteR_Button.IsEnabled = true;
-            }
-            if (FilesViewL.IsEnabled)
-            {
-                PasteR_Button_Copy.IsEnabled = true;
-            }
-        }
-
-        private void PasteDiscItem()
-        {
-            string destDirPath;
-            if (currFilesView == FilesViewL)
-            {
-                destDirPath = dirL.Path;
-            }
-            else
-            {
-                destDirPath = dirR.Path;
-            }
-            foreach (DiscItem item in filesToCopy)
-            {
-                if(item is FileItem)
-                {
-                    if (!File.Exists(Path.Combine(destDirPath, item.Name)))
-                    {
-                        File.Copy(item.Path, Path.Combine(destDirPath, item.Name));
-                    }                    
-                }
-                else if(item is DirectoryItem)
-                {   
-                    if(!Directory.Exists(Path.Combine(destDirPath, item.Name)))
-                    {
-                        Directory.CreateDirectory(Path.Combine(destDirPath, item.Name));
-                    }                    
-                    PasteDiscItem(Path.Combine(destDirPath, item.Name), item as DirectoryItem);
-                }
-            }                
-        }
-
-        private void PasteDiscItem(string destDirPath, DirectoryItem dir)
-        {
-            List<DirectoryItem> dirs = dir.GetDirectories();
-            List<FileItem> files = dir.GetFiles();
-            foreach (FileItem file in files)
-            {
-                if (!File.Exists(Path.Combine(destDirPath, file.Name)))
-                {
-                    File.Copy(file.Path, Path.Combine(destDirPath, file.Name));
-                }                
-            }
-            foreach (DirectoryItem directory in dirs)
-            {
-                if (!Directory.Exists(Path.Combine(destDirPath, directory.Name)))
-                {
-                    Directory.CreateDirectory(Path.Combine(destDirPath, directory.Name));
-                }
-                PasteDiscItem(Path.Combine(destDirPath, directory.Name), directory as DirectoryItem);
-            }
         }
 
         private void PasteR_Button_Click(object sender, RoutedEventArgs e)
@@ -514,29 +584,29 @@ namespace MiniCommander
             RefreshFilesView();
         }
 
-        
-        
 
-        private void FilesView_MouseMove(object sender, MouseEventArgs e)
-        {            
-            if (Mouse.LeftButton == MouseButtonState.Pressed)
+
+        #endregion
+
+        #region KeyEvents
+        /// <summary>
+        /// Keyboard shortcuts
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F7)
             {
-                CopyDiscItem();
-                DragDrop.DoDragDrop(currFilesView,
-                             currFilesView.SelectedItems,
-                             DragDropEffects.Copy);
+                CreateDirectory();
+            }
+            else if (e.Key == Key.F8 || e.Key == Key.Delete)
+            {
+                DeleteDiscItem();
             }
         }
+        #endregion
 
-        private void FilesView_Drop(object sender, DragEventArgs e)
-        {
-            if(currFilesView != sender as ListView)
-            {
-                currFilesView = sender as ListView;
-                PasteDiscItem();
-                GetItems();
-                RefreshFilesView();
-            }            
-        }
+        #endregion        
     }
 }
