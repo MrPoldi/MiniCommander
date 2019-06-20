@@ -12,7 +12,12 @@
             <ColumnDefinition Width="12*"/>
             <ColumnDefinition Width="73*"/>
         </Grid.ColumnDefinitions>
-        <ListView x:Name="FilesViewL" Height="342" Margin="25,52,0,0" VerticalAlignment="Top" MouseDoubleClick="FilesView_MouseDoubleClick" GotFocus="FilesViewL_GotFocus" HorizontalAlignment="Left" Width="331" AllowDrop="True" MouseMove="FilesView_MouseMove" Drop="FilesView_Drop" IsEnabled="False">
+        <ListView x:Name="FilesViewL" Height="342" Margin="25,52,0,0" VerticalAlignment="Top" MouseDoubleClick="FilesView_MouseDoubleClick" GotFocus="FilesViewL_GotFocus" HorizontalAlignment="Left" Width="331" AllowDrop="True" MouseMove="FilesView_MouseMove" Drop="FilesView_Drop" IsEnabled="False" PreviewMouseMove="FilesView_PreviewMouseMove" MouseLeftButtonDown="FilesView_MouseDown">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="FilesView_MouseDown"/>                    
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView AllowsColumnReorder="False">
                     <GridViewColumn DisplayMemberBinding="{Binding Name}">
@@ -26,8 +31,10 @@
             </ListView.View>
             <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem x:Name="ContextMenuDelete" Header="Delete" Click="ContextMenuDelete_Click" ></MenuItem>
+                    <MenuItem x:Name="ContextMenuDelete" Header="Delete" Click="ContextMenuDelete_Click" />
                     <MenuItem x:Name="ContextMenuNewDir" Header="Create Directory" Click="ContextMenuNewDir_Click"/>
+                    <MenuItem x:Name="ContextMenuCopy" Header="Copy" Click="ContextMenuCopy_Click"/>
+                    <MenuItem x:Name="ContextMenuPaste" Header="Paste" Click="ContextMenuPaste_Click"/>
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
@@ -49,14 +56,16 @@
                 <ContextMenu>
                     <MenuItem x:Name="ContextMenuDelete1" Header="Delete" Click="ContextMenuDelete_Click" />
                     <MenuItem x:Name="ContextMenuNewDir1" Header="Create Directory" Click="ContextMenuNewDir_Click"/>
+                    <MenuItem x:Name="ContextMenuCopy1" Header="Copy" Click="ContextMenuCopy_Click"/>
+                    <MenuItem x:Name="ContextMenuPaste1" Header="Paste" Click="ContextMenuPaste_Click"/>
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
         <ComboBox x:Name="drivesComboBoxR" HorizontalAlignment="Left" Margin="250,25,0,0" VerticalAlignment="Top" Width="120" Loaded="ComboBox_Loaded" SelectionChanged="DrivesComboBox_SelectionChanged" Grid.Column="2" Height="22"/>
-        <Button x:Name="DeleteDirectory_Button" Content="Delete" HorizontalAlignment="Left" Margin="374,230,0,0" VerticalAlignment="Top" Width="102" Grid.ColumnSpan="3" Click="Button_Click" IsEnabled="False"/>
-        <Button x:Name="CopyL_Button" Content="Copy" HorizontalAlignment="Left" Margin="164,25,0,0" VerticalAlignment="Top" Width="75" Height="22" Click="Copy_Button_Click" IsEnabled="False"/>
+        <Button x:Name="DeleteDirectory_Button" Content="Delete" HorizontalAlignment="Left" Margin="374,230,0,0" VerticalAlignment="Top" Width="102" Grid.ColumnSpan="3" Click="DeleteButton_Click" IsEnabled="False"/>
+        <Button x:Name="CopyL_Button" Content="Copy" HorizontalAlignment="Left" Margin="164,25,0,0" VerticalAlignment="Top" Width="75" Height="22" Click="CopyButton_Click" IsEnabled="False"/>
         <Button x:Name="PasteR_Button" Content="Paste" HorizontalAlignment="Left" Margin="65,25,0,0" VerticalAlignment="Top" Width="75" Height="22" RenderTransformOrigin="1.054,0.372" Grid.Column="2" Click="PasteR_Button_Click" IsEnabled="False"/>
-        <Button x:Name="CopyR_Button" Content="Copy" HorizontalAlignment="Left" Margin="158,25,0,0" VerticalAlignment="Top" Width="75" Height="22" Click="Copy_Button_Click" Grid.Column="2" IsEnabled="False"/>
+        <Button x:Name="CopyR_Button" Content="Copy" HorizontalAlignment="Left" Margin="158,25,0,0" VerticalAlignment="Top" Width="75" Height="22" Click="CopyButton_Click" Grid.Column="2" IsEnabled="False"/>
         <Button x:Name="PasteR_Button_Copy" Content="Paste" HorizontalAlignment="Left" Margin="260,25,0,0" VerticalAlignment="Top" Width="75" Height="22" RenderTransformOrigin="1.054,0.372" Click="PasteL_Button_Click" IsEnabled="False"/>
 
     </Grid>
