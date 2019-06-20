@@ -28,6 +28,9 @@ namespace MiniCommander
         DriveInfo[] drives;
         List<DiscItem> filesToCopy;
 
+        private bool isDragging = false;
+        private Point clickPoint;
+
         List <DirectoryItem> directoriesL;
         List<FileItem> filesL;
         UpperDirectory upDirL;
@@ -137,14 +140,15 @@ namespace MiniCommander
             RefreshFilesView();
         }
 
-        #region Copy and 
+        #region Copy and Paste
 
         /// <summary>
         /// Add selected files to a list and enable paste buttons
         /// </summary> 
         private void CopyDiscItem()
         {
-            // TODO: Enable ContextMenu buttons
+            // TODO: Repair enabling buttons            
+            filesToCopy = null;
             filesToCopy = new List<DiscItem>();
             foreach (DiscItem item in currFilesView.SelectedItems)
             {
@@ -169,11 +173,11 @@ namespace MiniCommander
             string destDirPath;
             if (currFilesView == FilesViewL)
             {
-                destDirPath = dirL.Path;
+                destDirPath = dirL.Path;                
             }
             else
             {
-                destDirPath = dirR.Path;
+                destDirPath = dirR.Path;                
             }
             foreach (DiscItem item in filesToCopy)
             {
@@ -409,6 +413,7 @@ namespace MiniCommander
         /// </summary>        
         private void FilesView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            currFilesView = sender as ListView;
             DiscItem item = currFilesView.SelectedItem as DiscItem;
             if (item is FileItem)
             {
@@ -420,6 +425,7 @@ namespace MiniCommander
             }
             else if (item is DirectoryItem)
             {
+                System.Diagnostics.Debug.WriteLine("a");
                 ChangeDirectory(item);
             }
         }
@@ -458,21 +464,24 @@ namespace MiniCommander
         }
 
         /// <summary>
-        /// Eneble drag and drop copy of selected items
+        /// Copy files and directories on drag
         /// </summary>        
         private void FilesView_MouseMove(object sender, MouseEventArgs e)
         {
-            if (Mouse.LeftButton == MouseButtonState.Pressed)
+            if (isDragging)
             {
-                CopyDiscItem();
-                DragDrop.DoDragDrop(currFilesView,
-                             currFilesView.SelectedItems,
-                             DragDropEffects.Copy);
+                if (Mouse.LeftButton == MouseButtonState.Pressed)
+                {                    
+                    CopyDiscItem();
+                    DragDrop.DoDragDrop(currFilesView,
+                                 currFilesView.SelectedItems,
+                                 DragDropEffects.Copy);
+                }
             }
         }
 
         /// <summary>
-        /// Paste files on drop
+        /// Paste files and directories on drop
         /// </summary>        
         private void FilesView_Drop(object sender, DragEventArgs e)
         {
@@ -484,10 +493,38 @@ namespace MiniCommander
                 RefreshFilesView();
             }
         }
+
+        /// <summary>
+        /// Blocks dragging and gets cursor position
+        /// </summary>        
+        private void FilesView_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            isDragging = false;
+            //System.Diagnostics.Debug.WriteLine("DOWN");
+            clickPoint = e.GetPosition(this);
+        }
+
+        /// <summary>
+        /// Enables dragging after 10 pixels of mouse movement distance
+        /// </summary>
+        private void FilesView_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Point currentPosition = e.GetPosition(this);
+                double distanceX = Math.Abs(clickPoint.X - currentPosition.X);
+                double distanceY = Math.Abs(clickPoint.Y - currentPosition.Y);
+                if (distanceX > 10 || distanceY > 10)
+                {
+                    isDragging = true;
+                    //System.Diagnostics.Debug.WriteLine("MOVE");
+                }
+            }
+        }
         #endregion
 
         #region Context Menu
-        
+
         private void ContextMenuDelete_Click(object sender, RoutedEventArgs e)
         {
             DeleteDiscItem();
@@ -501,6 +538,14 @@ namespace MiniCommander
         private void ContextMenuCopy_Click(object sender, RoutedEventArgs e)
         {
             CopyDiscItem();
+        }
+
+        private void ContextMenuPaste_Click(object sender, RoutedEventArgs e)
+        {
+            PasteDiscItem();
+
+            GetItems();
+            RefreshFilesView();
         }
         #endregion
 
@@ -607,6 +652,6 @@ namespace MiniCommander
         }
         #endregion
 
-        #endregion        
+        #endregion
     }
 }

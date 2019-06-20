@@ -12,7 +12,12 @@
             <ColumnDefinition Width="12*"/>
             <ColumnDefinition Width="73*"/>
         </Grid.ColumnDefinitions>
-        <ListView x:Name="FilesViewL" Height="342" Margin="25,52,0,0" VerticalAlignment="Top" MouseDoubleClick="FilesView_MouseDoubleClick" GotFocus="FilesViewL_GotFocus" HorizontalAlignment="Left" Width="331" AllowDrop="True" MouseMove="FilesView_MouseMove" Drop="FilesView_Drop" IsEnabled="False">
+        <ListView x:Name="FilesViewL" Height="342" Margin="25,52,0,0" VerticalAlignment="Top" MouseDoubleClick="FilesView_MouseDoubleClick" GotFocus="FilesViewL_GotFocus" HorizontalAlignment="Left" Width="331" AllowDrop="True" MouseMove="FilesView_MouseMove" Drop="FilesView_Drop" IsEnabled="False" PreviewMouseMove="FilesView_PreviewMouseMove" MouseLeftButtonDown="FilesView_MouseDown">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="FilesView_MouseDown"/>                    
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView AllowsColumnReorder="False">
                     <GridViewColumn DisplayMemberBinding="{Binding Name}">
@@ -26,9 +31,10 @@
             </ListView.View>
             <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem x:Name="ContextMenuDelete" Header="Delete" Click="ContextMenuDelete_Click" ></MenuItem>
+                    <MenuItem x:Name="ContextMenuDelete" Header="Delete" Click="ContextMenuDelete_Click" />
                     <MenuItem x:Name="ContextMenuNewDir" Header="Create Directory" Click="ContextMenuNewDir_Click"/>
                     <MenuItem x:Name="ContextMenuCopy" Header="Copy" Click="ContextMenuCopy_Click"/>
+                    <MenuItem x:Name="ContextMenuPaste" Header="Paste" Click="ContextMenuPaste_Click"/>
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
@@ -51,6 +57,7 @@
                     <MenuItem x:Name="ContextMenuDelete1" Header="Delete" Click="ContextMenuDelete_Click" />
                     <MenuItem x:Name="ContextMenuNewDir1" Header="Create Directory" Click="ContextMenuNewDir_Click"/>
                     <MenuItem x:Name="ContextMenuCopy1" Header="Copy" Click="ContextMenuCopy_Click"/>
+                    <MenuItem x:Name="ContextMenuPaste1" Header="Paste" Click="ContextMenuPaste_Click"/>
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>

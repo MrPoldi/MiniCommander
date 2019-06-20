@@ -49,3 +49,7 @@ C:\Users\mrpol\Source\Repos\MiniCommander2\MiniCommander\MiniCommander\obj\Debug
 C:\Users\mrpol\Source\Repos\MiniCommander2\MiniCommander\MiniCommander\obj\Debug\MiniCommander.csproj.CoreCompileInputs.cache
 C:\Users\mrpol\Source\Repos\MiniCommander2\MiniCommander\MiniCommander\obj\Debug\MiniCommander.exe
 C:\Users\mrpol\Source\Repos\MiniCommander2\MiniCommander\MiniCommander\obj\Debug\MiniCommander.pdb
+C:\Users\mrpol\Source\Repos\MiniCommander2\MiniCommander\MiniCommander\bin\Debug\MiniCommander.exe.manifest
+C:\Users\mrpol\Source\Repos\MiniCommander2\MiniCommander\MiniCommander\bin\Debug\MiniCommander.application
+C:\Users\mrpol\Source\Repos\MiniCommander2\MiniCommander\MiniCommander\obj\Debug\MiniCommander.exe.manifest
+C:\Users\mrpol\Source\Repos\MiniCommander2\MiniCommander\MiniCommander\obj\Debug\MiniCommander.application
