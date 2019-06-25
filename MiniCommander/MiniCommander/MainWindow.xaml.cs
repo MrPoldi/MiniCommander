@@ -29,6 +29,7 @@ namespace MiniCommander
         List<DiscItem> filesToCopy;
 
         private bool isDragging = false;
+        private bool isTrack = false;
         private Point clickPoint;
 
         List <DirectoryItem> directoriesL;
@@ -468,6 +469,7 @@ namespace MiniCommander
         /// </summary>        
         private void FilesView_MouseMove(object sender, MouseEventArgs e)
         {
+            
             if (isDragging)
             {
                 if (Mouse.LeftButton == MouseButtonState.Pressed)
@@ -485,6 +487,7 @@ namespace MiniCommander
         /// </summary>        
         private void FilesView_Drop(object sender, DragEventArgs e)
         {
+            isDragging = false;
             if (currFilesView != sender as ListView)
             {
                 currFilesView = sender as ListView;
@@ -499,8 +502,8 @@ namespace MiniCommander
         /// </summary>        
         private void FilesView_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            isDragging = false;
-            //System.Diagnostics.Debug.WriteLine("DOWN");
+                       
+            isDragging = false;            
             clickPoint = e.GetPosition(this);
         }
 
@@ -509,8 +512,18 @@ namespace MiniCommander
         /// </summary>
         private void FilesView_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            DependencyObject src = VisualTreeHelper.GetParent((DependencyObject)e.OriginalSource);
+            if (src is System.Windows.Controls.Primitives.Track)
             {
+                isTrack = true;
+            }
+            else
+            {
+                isTrack = false;
+            }
+            if (e.LeftButton == MouseButtonState.Pressed && !isTrack)
+            {
+                //MessageBox.Show(sender.GetType().ToString());
                 Point currentPosition = e.GetPosition(this);
                 double distanceX = Math.Abs(clickPoint.X - currentPosition.X);
                 double distanceY = Math.Abs(clickPoint.Y - currentPosition.Y);
@@ -521,6 +534,7 @@ namespace MiniCommander
                 }
             }
         }
+        
         #endregion
 
         #region Context Menu
@@ -653,5 +667,7 @@ namespace MiniCommander
         #endregion
 
         #endregion
+
+        
     }
 }

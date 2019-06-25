@@ -40,7 +40,12 @@
         </ListView>
         <ComboBox x:Name="drivesComboBoxL" HorizontalAlignment="Left" Margin="25,25,0,0" VerticalAlignment="Top" Width="120" Loaded="ComboBox_Loaded" SelectionChanged="DrivesComboBox_SelectionChanged" Height="22"/>
         <Button x:Name="CreateDirectoryButton" Content="Create Directory" HorizontalAlignment="Left" Margin="374,175,0,0" VerticalAlignment="Top" Width="102" Click="CreateDirectoryButton_Click" Height="20" Grid.ColumnSpan="3" IsEnabled="False"/>
-        <ListView x:Name="FilesViewR" Height="342" Margin="0,52,25,0" VerticalAlignment="Top" MouseDoubleClick="FilesView_MouseDoubleClick" GotFocus="FilesViewR_GotFocus" Grid.Column="2" HorizontalAlignment="Right" Width="331" AllowDrop="True" Drop="FilesView_Drop" MouseMove="FilesView_MouseMove" IsEnabled="False">
+        <ListView x:Name="FilesViewR" Height="342" Margin="0,52,25,0" VerticalAlignment="Top" MouseDoubleClick="FilesView_MouseDoubleClick" GotFocus="FilesViewR_GotFocus" Grid.Column="2" HorizontalAlignment="Right" Width="331" AllowDrop="True" Drop="FilesView_Drop" MouseMove="FilesView_MouseMove" IsEnabled="False" MouseLeftButtonDown="FilesView_MouseDown" PreviewMouseMove="FilesView_PreviewMouseMove">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="FilesView_MouseDown"/>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView AllowsColumnReorder="False">
                     <GridViewColumn DisplayMemberBinding="{Binding Name}">
