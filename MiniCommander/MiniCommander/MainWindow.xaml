@@ -21,10 +21,10 @@
             <ListView.View>
                 <GridView AllowsColumnReorder="False">
                     <GridViewColumn DisplayMemberBinding="{Binding Name}">
-                        <GridViewColumnHeader Content="Name" Click="GridViewColumnHeader_Click" MinWidth="125"/>
+                        <GridViewColumnHeader Content="Name" Click="GridViewColumnHeader_Click" MinWidth="125" Tag="L"/>
                     </GridViewColumn>
                     <GridViewColumn DisplayMemberBinding="{Binding CreationDate}">
-                        <GridViewColumnHeader Content="Date" Click="GridViewColumnHeader_Click" MinWidth="125"/>
+                        <GridViewColumnHeader Content="Date" Click="GridViewColumnHeader_Click" MinWidth="125" Tag="L"/>
                     </GridViewColumn>
 
                 </GridView>
@@ -49,10 +49,10 @@
             <ListView.View>
                 <GridView AllowsColumnReorder="False">
                     <GridViewColumn DisplayMemberBinding="{Binding Name}">
-                        <GridViewColumnHeader Content="Name" Click="GridViewColumnHeader_Click" MinWidth="125"/>
+                        <GridViewColumnHeader Content="Name" Click="GridViewColumnHeader_Click" MinWidth="125" Tag="R"/>
                     </GridViewColumn>
                     <GridViewColumn DisplayMemberBinding="{Binding CreationDate}">
-                        <GridViewColumnHeader Content="Date" Click="GridViewColumnHeader_Click" MinWidth="125"/>
+                        <GridViewColumnHeader Content="Date" Click="GridViewColumnHeader_Click" MinWidth="125" Tag="R"/>
                     </GridViewColumn>
 
                 </GridView>

@@ -28,6 +28,7 @@ namespace MiniCommander
         DriveInfo[] drives;
         List<DiscItem> filesToCopy;
 
+        private bool canRefreshBoth = true;
         private bool isDragging = false;
         private bool isTrack = false;
         private Point clickPoint;
@@ -68,12 +69,14 @@ namespace MiniCommander
                 directoriesL = dirL.GetDirectories();
                 filesL = dirL.GetFiles();
                 upDirL = dirL.GetUpperDirectory();
+                ascendingSortNameL = true;
             }
             else
             {
                 directoriesR = dirR.GetDirectories();
                 filesR = dirR.GetFiles();
                 upDirR = dirR.GetUpperDirectory();
+                ascendingSortNameR = true;
             }
         }        
 
@@ -86,10 +89,12 @@ namespace MiniCommander
             if (currFilesView == FilesViewL)
             {
                 dirL = new DirectoryItem((sender as DirectoryItem).Path);
+                ascendingSortNameL = true;
             }
             else
             {
                 dirR = new DirectoryItem((sender as DirectoryItem).Path);
+                ascendingSortNameR = true;
             }
 
             GetItems();
@@ -236,7 +241,7 @@ namespace MiniCommander
         /// </summary>
         private void RefreshFilesView()
         {
-            if ((dirL != null && dirR != null) && dirL.Path == dirR.Path)
+            if ((dirL != null && dirR != null) && dirL.Path == dirR.Path && canRefreshBoth)
             {
                 ListView tempFV = currFilesView;
 
@@ -304,8 +309,7 @@ namespace MiniCommander
         /// </summary>
         /// <param name="sortBy">Name or Date</param>
         /// <param name="directories">List of directories to sort</param>
-        /// <param name="files">List of files to sort</param>
-        // TODO: Implement IComparable/IComparer rather than use this method to sort DiscItems
+        /// <param name="files">List of files to sort</param>        
         private void Sort(string sortBy, List<DirectoryItem> directories, List<FileItem> files)
         {
             bool ascendingSortName = true;
@@ -328,62 +332,33 @@ namespace MiniCommander
             {
                 if (ascendingSortName)
                 {
-
-                    directories.Sort(delegate (DirectoryItem x, DirectoryItem y)
-                    {
-                        return y.Name.CompareTo(x.Name);
-                    });
-
-                    files.Sort(delegate (FileItem x, FileItem y)
-                    {
-                        return y.Name.CompareTo(x.Name);
-                    });
-
+                    directories.Sort(new DiscItem.SortByNameDescending());
+                    files.Sort(new DiscItem.SortByNameDescending());
+                    
                     ascendingSortName = false;
                 }
                 else
                 {
-                    directories.Sort(delegate (DirectoryItem x, DirectoryItem y)
-                    {
-                        return x.Name.CompareTo(y.Name);
-                    });
-
-                    files.Sort(delegate (FileItem x, FileItem y)
-                    {
-                        return x.Name.CompareTo(y.Name);
-                    });
+                    directories.Sort(new DiscItem.SortByNameAscending());
+                    files.Sort(new DiscItem.SortByNameAscending());
 
                     ascendingSortName = true;
-                }
+                }                
             }
 
             if (sortBy == "Date")
             {
                 if (ascendingSortDate)
                 {
-                    directories.Sort(delegate (DirectoryItem x, DirectoryItem y)
-                    {
-                        return y.CreationDate.CompareTo(x.CreationDate);
-                    });
-
-                    files.Sort(delegate (FileItem x, FileItem y)
-                    {
-                        return y.CreationDate.CompareTo(x.CreationDate);
-                    });
+                    directories.Sort(new DiscItem.SortByDateDescending());
+                    files.Sort(new DiscItem.SortByDateDescending());
 
                     ascendingSortDate = false;
                 }
                 else
                 {
-                    directories.Sort(delegate (DirectoryItem x, DirectoryItem y)
-                    {
-                        return x.CreationDate.CompareTo(y.CreationDate);
-                    });
-
-                    files.Sort(delegate (FileItem x, FileItem y)
-                    {
-                        return x.CreationDate.CompareTo(y.CreationDate);
-                    });
+                    directories.Sort(new DiscItem.SortByDateAscending());
+                    files.Sort(new DiscItem.SortByDateAscending());
 
                     ascendingSortDate = true;
                 }
@@ -400,7 +375,9 @@ namespace MiniCommander
                 ascendingSortNameR = ascendingSortName;
             }
 
+            canRefreshBoth = false;
             RefreshFilesView();
+            canRefreshBoth = true;
         }
 
         #endregion
@@ -436,16 +413,27 @@ namespace MiniCommander
         /// </summary>        
         private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
         {
+            isDragging = false;            
             var headerClicked = e.OriginalSource as GridViewColumnHeader;
-            string header = headerClicked.Content as string;
-            if (dirL != null && currFilesView == FilesViewL)
+            if (headerClicked.Tag.ToString() == "L")
             {
+                currFilesView = FilesViewL;
+            }
+            else if(headerClicked.Tag.ToString() == "R")
+            {
+                currFilesView = FilesViewR;
+            }
+            string header = headerClicked.Content as string;            
+            if (dirL != null && currFilesView == FilesViewL)                
+            {
+                //MessageBox.Show("L");
                 Sort(header, directoriesL, filesL);
             }
             else if (dirR != null && currFilesView == FilesViewR)
             {
+                //MessageBox.Show("R");
                 Sort(header, directoriesR, filesR);
-            }
+            }            
         }
 
         /// <summary>
