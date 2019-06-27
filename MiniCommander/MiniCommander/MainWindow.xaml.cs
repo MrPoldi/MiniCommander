@@ -652,10 +652,113 @@ namespace MiniCommander
                 DeleteDiscItem();
             }
         }
-        #endregion
 
         #endregion
 
-        
+        #endregion
+
+        private void FilesViewL_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            currFilesView = sender as ListView;
+        }
+
+        private void ContextMenuSortByName_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContextMenuSortByDate.IsChecked)
+            {
+                ContextMenuSortByDate.IsChecked = false;
+            }
+            else
+            {
+                ContextMenuSortByName.IsChecked = true;
+            }
+        }
+
+        private void ContextMenuSortByDate_Click(object sender, RoutedEventArgs e)
+        {            
+            if (ContextMenuSortByName.IsChecked)
+            {
+                ContextMenuSortByName.IsChecked = false;
+            }
+            else
+            {
+                ContextMenuSortByDate.IsChecked = true;
+            }
+        }
+
+        private void ContextMenuAscending_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContextMenuDescending.IsChecked)
+            {
+                ContextMenuDescending.IsChecked = false;
+            }
+            else
+            {
+                ContextMenuAscending.IsChecked = true;
+            }
+        }
+
+        private void ContextMenuDescending_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContextMenuAscending.IsChecked)
+            {
+                ContextMenuAscending.IsChecked = false;
+            }
+            else
+            {
+                ContextMenuDescending.IsChecked = true;
+            }
+        }
+
+        private void ContextMenuSortByName1_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContextMenuSortByDate1.IsChecked)
+            {
+                ContextMenuSortByDate1.IsChecked = false;
+            }
+            else
+            {
+                ContextMenuSortByName1.IsChecked = true;
+            }
+        }
+
+        private void ContextMenuSortByDate1_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContextMenuSortByName1.IsChecked)
+            {
+                ContextMenuSortByName1.IsChecked = false;
+            }
+            else
+            {
+                ContextMenuSortByDate1.IsChecked = true;
+            }
+        }
+
+        private void ContextMenuAscending1_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContextMenuDescending1.IsChecked)
+            {
+                ContextMenuDescending1.IsChecked = false;
+            }
+            else
+            {
+                ContextMenuAscending1.IsChecked = true;
+            }
+        }
+
+        private void ContextMenuDescending1_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContextMenuAscending1.IsChecked)
+            {
+                ContextMenuAscending1.IsChecked = false;
+            }
+            else
+            {
+                ContextMenuDescending1.IsChecked = true;
+            }
+        }
+
+        // TODO: Clean-up code
+        // TODO: Make sort options class and use binding in context menu sorting
     }
 }

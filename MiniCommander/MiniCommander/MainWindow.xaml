@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MiniCommander"
         mc:Ignorable="d"
-        Title="MiniCommander" Height="450" Width="864.825">
-    <Grid Margin="0,0,2,0">
+        Title="MiniCommander" Height="450" Width="864.825">    
+    <Grid Margin="0,0,2,0">        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="73*"/>
             <ColumnDefinition Width="12*"/>
             <ColumnDefinition Width="73*"/>
         </Grid.ColumnDefinitions>
-        <ListView x:Name="FilesViewL" Height="342" Margin="25,52,0,0" VerticalAlignment="Top" MouseDoubleClick="FilesView_MouseDoubleClick" GotFocus="FilesViewL_GotFocus" HorizontalAlignment="Left" Width="331" AllowDrop="True" MouseMove="FilesView_MouseMove" Drop="FilesView_Drop" IsEnabled="False" PreviewMouseMove="FilesView_PreviewMouseMove" MouseLeftButtonDown="FilesView_MouseDown">
+        <ListView x:Name="FilesViewL" Height="342" Margin="25,52,0,0" VerticalAlignment="Top" MouseDoubleClick="FilesView_MouseDoubleClick" GotFocus="FilesViewL_GotFocus" HorizontalAlignment="Left" Width="331" AllowDrop="True" MouseMove="FilesView_MouseMove" Drop="FilesView_Drop" IsEnabled="False" PreviewMouseMove="FilesView_PreviewMouseMove" MouseLeftButtonDown="FilesView_MouseDown" MouseRightButtonDown="FilesViewL_MouseRightButtonDown">
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">
                     <EventSetter Event="PreviewMouseLeftButtonDown" Handler="FilesView_MouseDown"/>                    
@@ -26,7 +26,6 @@
                     <GridViewColumn DisplayMemberBinding="{Binding CreationDate}">
                         <GridViewColumnHeader Content="Date" Click="GridViewColumnHeader_Click" MinWidth="125" Tag="L"/>
                     </GridViewColumn>
-
                 </GridView>
             </ListView.View>
             <ListView.ContextMenu>
@@ -35,11 +34,22 @@
                     <MenuItem x:Name="ContextMenuNewDir" Header="Create Directory" Click="ContextMenuNewDir_Click"/>
                     <MenuItem x:Name="ContextMenuCopy" Header="Copy" Click="ContextMenuCopy_Click"/>
                     <MenuItem x:Name="ContextMenuPaste" Header="Paste" Click="ContextMenuPaste_Click"/>
+                    <MenuItem x:Name="ContextMenuSort" Header="Sort by">
+                        <MenuItem x:Name="ContextMenuSortByName" IsChecked="True"  Header="Name" Click="ContextMenuSortByName_Click" IsCheckable="True" StaysOpenOnClick="True" />
+                        <MenuItem x:Name="ContextMenuSortByDate" Header="Date" Click="ContextMenuSortByDate_Click" IsCheckable="True" StaysOpenOnClick="True"/>
+                        <Separator/>
+                        <MenuItem x:Name="ContextMenuAscending" Header="Ascending" Click="ContextMenuAscending_Click" IsCheckable="True" StaysOpenOnClick="True" IsChecked="True"/>
+                        <MenuItem x:Name="ContextMenuDescending" Header="Descending" Click="ContextMenuDescending_Click" IsCheckable="True" StaysOpenOnClick="True"/>
+                    </MenuItem>
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
+        
+        
         <ComboBox x:Name="drivesComboBoxL" HorizontalAlignment="Left" Margin="25,25,0,0" VerticalAlignment="Top" Width="120" Loaded="ComboBox_Loaded" SelectionChanged="DrivesComboBox_SelectionChanged" Height="22"/>
         <Button x:Name="CreateDirectoryButton" Content="Create Directory" HorizontalAlignment="Left" Margin="374,175,0,0" VerticalAlignment="Top" Width="102" Click="CreateDirectoryButton_Click" Height="20" Grid.ColumnSpan="3" IsEnabled="False"/>
+        
+        
         <ListView x:Name="FilesViewR" Height="342" Margin="0,52,25,0" VerticalAlignment="Top" MouseDoubleClick="FilesView_MouseDoubleClick" GotFocus="FilesViewR_GotFocus" Grid.Column="2" HorizontalAlignment="Right" Width="331" AllowDrop="True" Drop="FilesView_Drop" MouseMove="FilesView_MouseMove" IsEnabled="False" MouseLeftButtonDown="FilesView_MouseDown" PreviewMouseMove="FilesView_PreviewMouseMove">
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">
@@ -63,6 +73,13 @@
                     <MenuItem x:Name="ContextMenuNewDir1" Header="Create Directory" Click="ContextMenuNewDir_Click"/>
                     <MenuItem x:Name="ContextMenuCopy1" Header="Copy" Click="ContextMenuCopy_Click"/>
                     <MenuItem x:Name="ContextMenuPaste1" Header="Paste" Click="ContextMenuPaste_Click"/>
+                    <MenuItem x:Name="ContextMenuSort1" Header="Sort by">
+                        <MenuItem x:Name="ContextMenuSortByName1" Header="Name" Click="ContextMenuSortByName1_Click" IsCheckable="True" StaysOpenOnClick="True" IsChecked="True"/>
+                        <MenuItem x:Name="ContextMenuSortByDate1" Header="Date" Click="ContextMenuSortByDate1_Click" IsCheckable="True" StaysOpenOnClick="True"/>
+                        <Separator/>
+                        <MenuItem x:Name="ContextMenuAscending1" Header="Ascending" Click="ContextMenuAscending1_Click" IsCheckable="True" StaysOpenOnClick="True" IsChecked="True"/>
+                        <MenuItem x:Name="ContextMenuDescending1" Header="Descending" Click="ContextMenuDescending1_Click" IsCheckable="True" StaysOpenOnClick="True"/>
+                    </MenuItem>
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>

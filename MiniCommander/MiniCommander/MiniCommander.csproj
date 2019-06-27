@@ -49,7 +49,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>  
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -74,6 +74,7 @@
     <Compile Include="CreateDirectoryDialog.xaml.cs">
       <DependentUpon>CreateDirectoryDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SortOptions.cs" />
     <Compile Include="UpperDirectory.cs" />
     <Page Include="CreateDirectoryDialog.xaml">
       <SubType>Designer</SubType>
